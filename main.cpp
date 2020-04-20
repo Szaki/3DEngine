@@ -12,231 +12,323 @@
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <windows.h>
 #endif
-#include <GL/glew.h>		
-#include <GL/freeglut.h>	
+#include <GL/glew.h>
+#include <GL/freeglut.h>
 #endif
 
 const unsigned int windowWidth = 600, windowHeight = 600;
 
-struct vec2 {
+struct vec2
+{
 	float x, y;
-	vec2(float _x = 0, float _y = 0) { x = _x; y = _y; }
+	vec2(float _x = 0, float _y = 0)
+	{
+		x = _x;
+		y = _y;
+	}
 };
 
-struct vec3 {
+struct vec3
+{
 	float x, y, z;
-	vec3(float _x = 0, float _y = 0, float _z = 0) { x = _x; y = _y; z = _z; }
+	vec3(float _x = 0, float _y = 0, float _z = 0)
+	{
+		x = _x;
+		y = _y;
+		z = _z;
+	}
 	vec3 operator*(float a) const { return vec3(x * a, y * a, z * a); }
-	vec3 operator+(const vec3& v) const { return vec3(x + v.x, y + v.y, z + v.z); }
-	vec3 operator-(const vec3& v) const { return vec3(x - v.x, y - v.y, z - v.z); }
-	vec3 operator*(const vec3& v) const { return vec3(x * v.x, y * v.y, z * v.z); }
+	vec3 operator+(const vec3 &v) const { return vec3(x + v.x, y + v.y, z + v.z); }
+	vec3 operator-(const vec3 &v) const { return vec3(x - v.x, y - v.y, z - v.z); }
+	vec3 operator*(const vec3 &v) const { return vec3(x * v.x, y * v.y, z * v.z); }
 	vec3 operator-() const { return vec3(-x, -y, -z); }
 	vec3 normalize() const { return (*this) * (1.0f / (Length() + 0.000001)); }
 	float Length() const { return sqrtf(x * x + y * y + z * z); }
 
-	void SetUniform(unsigned shaderProg, char * name) {
+	void SetUniform(unsigned shaderProg, char *name)
+	{
 		int location = glGetUniformLocation(shaderProg, name);
-		if (location >= 0) glUniform3fv(location, 1, &x);
-		else printf("uniform %s cannot be set\n", name);
+		if (location >= 0)
+			glUniform3fv(location, 1, &x);
+		else
+			printf("uniform %s cannot be set\n", name);
 	}
 };
 
-float dot(const vec3& v1, const vec3& v2) { return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z); }
+float dot(const vec3 &v1, const vec3 &v2) { return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z); }
 
-vec3 cross(const vec3& v1, const vec3& v2) { return vec3(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x); }
+vec3 cross(const vec3 &v1, const vec3 &v2) { return vec3(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x); }
 
-struct vec4 {
+struct vec4
+{
 	float x, y, z, w;
-	vec4(float _x = 0, float _y = 0, float _z = 0, float _w = 1) { x = _x; y = _y; z = _z; w = _w; }
+	vec4(float _x = 0, float _y = 0, float _z = 0, float _w = 1)
+	{
+		x = _x;
+		y = _y;
+		z = _z;
+		w = _w;
+	}
 
-	void SetUniform(unsigned shaderProg, char * name) {
+	void SetUniform(unsigned shaderProg, char *name)
+	{
 		int location = glGetUniformLocation(shaderProg, name);
-		if (location >= 0) glUniform4fv(location, 1, &x);
-		else printf("uniform %s cannot be set\n", name);
+		if (location >= 0)
+			glUniform4fv(location, 1, &x);
+		else
+			printf("uniform %s cannot be set\n", name);
 	}
 };
 
-
-struct mat4 { 
+struct mat4
+{
 	float m[4][4];
+
 public:
 	mat4() {}
 	mat4(float m00, float m01, float m02, float m03,
-		float m10, float m11, float m12, float m13,
-		float m20, float m21, float m22, float m23,
-		float m30, float m31, float m32, float m33) {
-		m[0][0] = m00; m[0][1] = m01; m[0][2] = m02; m[0][3] = m03;
-		m[1][0] = m10; m[1][1] = m11; m[1][2] = m12; m[1][3] = m13;
-		m[2][0] = m20; m[2][1] = m21; m[2][2] = m22; m[2][3] = m23;
-		m[3][0] = m30; m[3][1] = m31; m[3][2] = m32; m[3][3] = m33;
+		 float m10, float m11, float m12, float m13,
+		 float m20, float m21, float m22, float m23,
+		 float m30, float m31, float m32, float m33)
+	{
+		m[0][0] = m00;
+		m[0][1] = m01;
+		m[0][2] = m02;
+		m[0][3] = m03;
+		m[1][0] = m10;
+		m[1][1] = m11;
+		m[1][2] = m12;
+		m[1][3] = m13;
+		m[2][0] = m20;
+		m[2][1] = m21;
+		m[2][2] = m22;
+		m[2][3] = m23;
+		m[3][0] = m30;
+		m[3][1] = m31;
+		m[3][2] = m32;
+		m[3][3] = m33;
 	}
 
-	mat4 operator*(const mat4& right) {
+	mat4 operator*(const mat4 &right)
+	{
 		mat4 result;
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = 0; j < 4; j++)
+			{
 				result.m[i][j] = 0;
-				for (int k = 0; k < 4; k++) result.m[i][j] += m[i][k] * right.m[k][j];
+				for (int k = 0; k < 4; k++)
+					result.m[i][j] += m[i][k] * right.m[k][j];
 			}
 		}
 		return result;
 	}
 
-	void SetUniform(unsigned shaderProg, char * name) {
-		int location = glGetUniformLocation(shaderProg, name);   	
-		if (location >= 0) glUniformMatrix4fv(location, 1, GL_TRUE, &m[0][0]);
-		else printf("uniform %s cannot be set\n", name);		
+	void SetUniform(unsigned shaderProg, char *name)
+	{
+		int location = glGetUniformLocation(shaderProg, name);
+		if (location >= 0)
+			glUniformMatrix4fv(location, 1, GL_TRUE, &m[0][0]);
+		else
+			printf("uniform %s cannot be set\n", name);
 	}
 };
 
-mat4 TranslateMatrix(vec3 t) {
+mat4 TranslateMatrix(vec3 t)
+{
 	return mat4(1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
 				t.x, t.y, t.z, 1);
 }
 
-mat4 ScaleMatrix(vec3 s) {
+mat4 ScaleMatrix(vec3 s)
+{
 	return mat4(s.x, 0, 0, 0,
 				0, s.y, 0, 0,
 				0, 0, s.z, 0,
 				0, 0, 0, 1);
 }
 
-mat4 RotationMatrix(float angle, vec3 w) {
+mat4 RotationMatrix(float angle, vec3 w)
+{
 	float c = cosf(angle), s = sinf(angle);
 	w = w.normalize();
-	return mat4(c * (1 - w.x*w.x) + w.x*w.x, w.x*w.y*(1 - c) + w.z*s,     w.x*w.z*(1 - c) - w.y*s,     0,
-		        w.x*w.y*(1 - c) - w.z*s,     c * (1 - w.y*w.y) + w.y*w.y, w.y*w.z*(1 - c) + w.x*s,     0,
-				w.x*w.z*(1 - c) + w.y*s,     w.y*w.z*(1 - c) - w.x*s,     c * (1 - w.z*w.z) + w.z*w.z, 0,
-				0,                           0,                           0,                           1);
+	return mat4(c * (1 - w.x * w.x) + w.x * w.x, w.x * w.y * (1 - c) + w.z * s, w.x * w.z * (1 - c) - w.y * s, 0,
+				w.x * w.y * (1 - c) - w.z * s, c * (1 - w.y * w.y) + w.y * w.y, w.y * w.z * (1 - c) + w.x * s, 0,
+				w.x * w.z * (1 - c) + w.y * s, w.y * w.z * (1 - c) - w.x * s, c * (1 - w.z * w.z) + w.z * w.z, 0,
+				0, 0, 0, 1);
 }
 
-struct Camera { 
-	vec3 wEye, wLookat, wVup;   
-	float fov, asp, fp, bp;		
+struct Camera
+{
+	vec3 wEye, wLookat, wVup;
+	float fov, asp, fp, bp;
+
 public:
-	Camera() {
+	Camera()
+	{
 		asp = 1;
 		fov = 60.0f * (float)M_PI / 180.0f;
-		fp = 1; bp = 10;
+		fp = 1;
+		bp = 10;
 	}
-	mat4 V() { 
+	mat4 V()
+	{
 		vec3 w = (wEye - wLookat).normalize();
 		vec3 u = cross(wVup, w).normalize();
 		vec3 v = cross(w, u);
 		return TranslateMatrix(-wEye) * mat4(u.x, v.x, w.x, 0,
 											 u.y, v.y, w.y, 0,
 											 u.z, v.z, w.z, 0,
-											 0,   0,   0,   1);
+											 0, 0, 0, 1);
 	}
-	mat4 P() { 
-		return mat4(1 / (tan(fov / 2)*asp), 0, 0, 0,
+	mat4 P()
+	{
+		return mat4(1 / (tan(fov / 2) * asp), 0, 0, 0,
 					0, 1 / tan(fov / 2), 0, 0,
 					0, 0, -(fp + bp) / (bp - fp), -1,
-					0, 0, -2 * fp*bp / (bp - fp), 0);
+					0, 0, -2 * fp * bp / (bp - fp), 0);
 	}
-	void Animate(float t) { }
+	void Animate(float t) {}
 };
 
-struct Material {
+struct Material
+{
 	vec3 kd, ks, ka;
 	float shininess;
 };
 
-struct Light {
+struct Light
+{
 	vec3 La, Le;
 	vec4 wLightPos;
 
-	void Animate(float t) {	}
+	void Animate(float t) {}
 };
 
-struct Texture {
+struct Texture
+{
 	unsigned int textureId;
 
-	Texture(const int width, const int height) {  glGenTextures(1, &textureId); }
+	Texture(const int width, const int height) { glGenTextures(1, &textureId); }
 
-	void SetUniform(unsigned shaderProg, char * samplerName, unsigned int textureUnit = 0) {
+	void SetUniform(unsigned shaderProg, char *samplerName, unsigned int textureUnit = 0)
+	{
 		int location = glGetUniformLocation(shaderProg, samplerName);
-		if (location >= 0) {
+		if (location >= 0)
+		{
 			glUniform1i(location, textureUnit);
 			glActiveTexture(GL_TEXTURE0 + textureUnit);
 			glBindTexture(GL_TEXTURE_2D, textureId);
-		} else printf("uniform %s cannot be set\n", samplerName);
+		}
+		else
+			printf("uniform %s cannot be set\n", samplerName);
 	}
 };
 
-struct CheckerBoardTexture : public Texture {
-	CheckerBoardTexture(const int width = 0, const int height = 0) : Texture(width, height) {
-		glBindTexture(GL_TEXTURE_2D, textureId);    
+struct CheckerBoardTexture : public Texture
+{
+	CheckerBoardTexture(const int width = 0, const int height = 0) : Texture(width, height)
+	{
+		glBindTexture(GL_TEXTURE_2D, textureId);
 		std::vector<vec3> image(width * height);
 		const vec3 yellow(1, 1, 0), blue(0, 0, 1);
-		for (int x = 0; x < width; x++) for (int y = 0; y < height; y++) {
-			image[y * width + x] = (x & 1) ^ (y & 1) ? yellow : blue;
-		}
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_FLOAT, &image[0]); 
+		for (int x = 0; x < width; x++)
+			for (int y = 0; y < height; y++)
+			{
+				image[y * width + x] = (x & 1) ^ (y & 1) ? yellow : blue;
+			}
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_FLOAT, &image[0]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
 };
 
-struct RenderState {
-	mat4	  MVP, M, Minv, V, P;
-	Material* material;
-	Light     light;
-	Texture*  texture;
-	vec3	  wEye;
+struct RenderState
+{
+	mat4 MVP, M, Minv, V, P;
+	Material *material;
+	Light light;
+	Texture *texture;
+	vec3 wEye;
 };
 
-class Shader {
-	void getErrorInfo(unsigned int handle) {
+class Shader
+{
+	void getErrorInfo(unsigned int handle)
+	{
 		int logLen, written;
 		glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &logLen);
-		if (logLen > 0) {
-			char * log = new char[logLen];
+		if (logLen > 0)
+		{
+			char *log = new char[logLen];
 			glGetShaderInfoLog(handle, logLen, &written, log);
 			printf("Shader log:\n%s", log);
 			delete log;
 		}
 	}
-	void checkShader(unsigned int shader, char * message) { 	
+	void checkShader(unsigned int shader, char *message)
+	{
 		int OK;
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &OK);
-		if (!OK) { printf("%s!\n", message); getErrorInfo(shader); getchar(); }
+		if (!OK)
+		{
+			printf("%s!\n", message);
+			getErrorInfo(shader);
+			getchar();
+		}
 	}
-	void checkLinking(unsigned int program) { 	
+	void checkLinking(unsigned int program)
+	{
 		int OK;
 		glGetProgramiv(program, GL_LINK_STATUS, &OK);
-		if (!OK) { printf("Failed to link shader program!\n"); getErrorInfo(program); getchar(); }
+		if (!OK)
+		{
+			printf("Failed to link shader program!\n");
+			getErrorInfo(program);
+			getchar();
+		}
 	}
+
 protected:
 	unsigned int shaderProgram;
+
 public:
-	void Create(const char * vertexSource, const char * fragmentSource, const char * fsOuputName) {
-		
+	void Create(const char *vertexSource, const char *fragmentSource, const char *fsOuputName)
+	{
+
 		unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		if (!vertexShader) { printf("Error in vertex shader creation\n"); exit(1); }
+		if (!vertexShader)
+		{
+			printf("Error in vertex shader creation\n");
+			exit(1);
+		}
 		glShaderSource(vertexShader, 1, &vertexSource, NULL);
 		glCompileShader(vertexShader);
 		checkShader(vertexShader, "Vertex shader error");
 
-		
 		unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		if (!fragmentShader) { printf("Error in fragment shader creation\n"); exit(1); }
+		if (!fragmentShader)
+		{
+			printf("Error in fragment shader creation\n");
+			exit(1);
+		}
 		glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
 		glCompileShader(fragmentShader);
 		checkShader(fragmentShader, "Fragment shader error");
 
-		
 		shaderProgram = glCreateProgram();
-		if (!shaderProgram) { printf("Error in shader program creation\n"); exit(1); }
+		if (!shaderProgram)
+		{
+			printf("Error in shader program creation\n");
+			exit(1);
+		}
 		glAttachShader(shaderProgram, vertexShader);
 		glAttachShader(shaderProgram, fragmentShader);
 
-		
-		glBindFragDataLocation(shaderProgram, 0, fsOuputName);	
+		glBindFragDataLocation(shaderProgram, 0, fsOuputName);
 
-		
 		glLinkProgram(shaderProgram);
 		checkLinking(shaderProgram);
 	}
@@ -244,8 +336,9 @@ public:
 	~Shader() { glDeleteProgram(shaderProgram); }
 };
 
-class GouraudShader : public Shader {
-	const char * vertexSource = R"(
+class GouraudShader : public Shader
+{
+	const char *vertexSource = R"(
 		#version 330
 		precision highp float;
 
@@ -274,8 +367,7 @@ class GouraudShader : public Shader {
 		}
 	)";
 
-	
-	const char * fragmentSource = R"(
+	const char *fragmentSource = R"(
 		#version 330
 		precision highp float;
 
@@ -286,11 +378,13 @@ class GouraudShader : public Shader {
 			fragmentColor = vec4(radiance, 1);
 		}
 	)";
+
 public:
 	GouraudShader() { Create(vertexSource, fragmentSource, "fragmentColor"); }
 
-	void Bind(RenderState state) {
-		glUseProgram(shaderProgram); 		
+	void Bind(RenderState state)
+	{
+		glUseProgram(shaderProgram);
 		state.MVP.SetUniform(shaderProgram, "MVP");
 		state.M.SetUniform(shaderProgram, "M");
 		state.Minv.SetUniform(shaderProgram, "Minv");
@@ -299,15 +393,19 @@ public:
 		state.material->ks.SetUniform(shaderProgram, "ks");
 		state.material->ka.SetUniform(shaderProgram, "ka");
 		int location = glGetUniformLocation(shaderProgram, "shine");
-		if (location >= 0) glUniform1f(location, state.material->shininess); else printf("uniform shininess cannot be set\n");
+		if (location >= 0)
+			glUniform1f(location, state.material->shininess);
+		else
+			printf("uniform shininess cannot be set\n");
 		state.light.La.SetUniform(shaderProgram, "La");
 		state.light.Le.SetUniform(shaderProgram, "Le");
 		state.light.wLightPos.SetUniform(shaderProgram, "wLiPos");
 	}
 };
 
-class PhongShader : public Shader {
-	const char * vertexSource = R"(
+class PhongShader : public Shader
+{
+	const char *vertexSource = R"(
 		#version 330
 		precision highp float;
 
@@ -336,8 +434,7 @@ class PhongShader : public Shader {
 		}
 	)";
 
-	
-	const char * fragmentSource = R"(
+	const char *fragmentSource = R"(
 		#version 330
 		precision highp float;
 
@@ -365,11 +462,13 @@ class PhongShader : public Shader {
 			fragmentColor = vec4(color, 1);
 		}
 	)";
+
 public:
 	PhongShader() { Create(vertexSource, fragmentSource, "fragmentColor"); }
 
-	void Bind(RenderState state) {
-		glUseProgram(shaderProgram); 		
+	void Bind(RenderState state)
+	{
+		glUseProgram(shaderProgram);
 		state.MVP.SetUniform(shaderProgram, "MVP");
 		state.M.SetUniform(shaderProgram, "M");
 		state.Minv.SetUniform(shaderProgram, "Minv");
@@ -378,16 +477,20 @@ public:
 		state.material->ks.SetUniform(shaderProgram, "ks");
 		state.material->ka.SetUniform(shaderProgram, "ka");
 		int location = glGetUniformLocation(shaderProgram, "shine");
-		if (location >= 0) glUniform1f(location, state.material->shininess); else printf("uniform shininess cannot be set\n");
+		if (location >= 0)
+			glUniform1f(location, state.material->shininess);
+		else
+			printf("uniform shininess cannot be set\n");
 		state.light.La.SetUniform(shaderProgram, "La");
 		state.light.Le.SetUniform(shaderProgram, "Le");
 		state.light.wLightPos.SetUniform(shaderProgram, "wLiPos");
-		state.texture->SetUniform(shaderProgram, "diffuseTexture"); 
+		state.texture->SetUniform(shaderProgram, "diffuseTexture");
 	}
 };
 
-class NPRShader : public Shader {
-	const char * vertexSource = R"(
+class NPRShader : public Shader
+{
+	const char *vertexSource = R"(
 		#version 330
 		precision highp float;
 
@@ -412,8 +515,7 @@ class NPRShader : public Shader {
 		}
 	)";
 
-	
-	const char * fragmentSource = R"(
+	const char *fragmentSource = R"(
 		#version 330
 		precision highp float;
 
@@ -430,11 +532,13 @@ class NPRShader : public Shader {
 		   else						 fragmentColor = vec4(y * texture(diffuseTexture, texcoord).rgb, 1);
 		}
 	)";
+
 public:
 	NPRShader() { Create(vertexSource, fragmentSource, "fragmentColor"); }
 
-	void Bind(RenderState state) {
-		glUseProgram(shaderProgram); 		
+	void Bind(RenderState state)
+	{
+		glUseProgram(shaderProgram);
 		state.MVP.SetUniform(shaderProgram, "MVP");
 		state.M.SetUniform(shaderProgram, "M");
 		state.Minv.SetUniform(shaderProgram, "Minv");
@@ -444,41 +548,51 @@ public:
 	}
 };
 
-struct VertexData {
+struct VertexData
+{
 	vec3 position, normal;
 	vec2 texcoord;
 };
 
-class Geometry {
-	unsigned int vao, type;        
-protected: 
+class Geometry
+{
+	unsigned int vao, type;
+
+protected:
 	int nVertices;
+
 public:
-	Geometry(unsigned int _type) {
+	Geometry(unsigned int _type)
+	{
 		type = _type;
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
 	}
-	void Draw() {
+	void Draw()
+	{
 		glBindVertexArray(vao);
 		glDrawArrays(type, 0, nVertices);
 	}
 };
 
-class ParamSurface : public Geometry {
+class ParamSurface : public Geometry
+{
 public:
 	ParamSurface() : Geometry(GL_TRIANGLES) {}
 
 	virtual VertexData GenVertexData(float u, float v) = 0;
 
-	void Create(int N = 16, int M = 16) {
+	void Create(int N = 16, int M = 16)
+	{
 		unsigned int vbo;
-		glGenBuffers(1, &vbo); 
+		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		nVertices = N * M * 6;
-		std::vector<VertexData> vtxData;	
-		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < M; j++) {
+		std::vector<VertexData> vtxData;
+		for (int i = 0; i < N; i++)
+		{
+			for (int j = 0; j < M; j++)
+			{
 				vtxData.push_back(GenVertexData((float)i / N, (float)j / M));
 				vtxData.push_back(GenVertexData((float)(i + 1) / N, (float)j / M));
 				vtxData.push_back(GenVertexData((float)i / N, (float)(j + 1) / M));
@@ -488,41 +602,47 @@ public:
 			}
 		}
 		glBufferData(GL_ARRAY_BUFFER, nVertices * sizeof(VertexData), &vtxData[0], GL_STATIC_DRAW);
-		
-		glEnableVertexAttribArray(0);  
-		glEnableVertexAttribArray(1);  
-		glEnableVertexAttribArray(2);  
-		
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, position)); 
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, normal));
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void*)offsetof(VertexData, texcoord));
+
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)offsetof(VertexData, position));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)offsetof(VertexData, normal));
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)offsetof(VertexData, texcoord));
 	}
 };
 
-class Sphere : public ParamSurface {
+class Sphere : public ParamSurface
+{
 public:
 	Sphere() { Create(20, 20); }
 
-	VertexData GenVertexData(float u, float v) {
+	VertexData GenVertexData(float u, float v)
+	{
 		VertexData vd;
-		vd.position = vd.normal = vec3(cosf(u * 2.0f * M_PI) * sinf(v*M_PI), sinf(u * 2.0f * M_PI) * sinf(v*M_PI), cosf(v*M_PI));
+		vd.position = vd.normal = vec3(cosf(u * 2.0f * M_PI) * sinf(v * M_PI), sinf(u * 2.0f * M_PI) * sinf(v * M_PI), cosf(v * M_PI));
 		vd.texcoord = vec2(u, v);
 		return vd;
 	}
 };
 
-class Torus : public ParamSurface {
+class Torus : public ParamSurface
+{
 	const float R = 1, r = 0.5;
 
-	vec3 Point(float u, float v, float rr) {
+	vec3 Point(float u, float v, float rr)
+	{
 		float ur = u * 2.0f * M_PI, vr = v * 2.0f * M_PI;
 		float l = R + rr * cosf(ur);
 		return vec3(l * cosf(vr), l * sinf(vr), rr * sinf(ur));
 	}
+
 public:
 	Torus() { Create(40, 40); }
 
-	VertexData GenVertexData(float u, float v) {
+	VertexData GenVertexData(float u, float v)
+	{
 		VertexData vd;
 		vd.position = Point(u, v, r);
 		vd.normal = (vd.position - Point(u, v, 0)) * (1.0f / r);
@@ -531,23 +651,26 @@ public:
 	}
 };
 
-struct Object {
-	Shader * shader;
-	Material * material;
-	Texture * texture;
-	Geometry * geometry;
+struct Object
+{
+	Shader *shader;
+	Material *material;
+	Texture *texture;
+	Geometry *geometry;
 	vec3 scale, translation, rotationAxis;
 	float rotationAngle;
+
 public:
-	Object(Shader * _shader, Material * _material, Texture * _texture, Geometry * _geometry) :
-		scale(vec3(1, 1, 1)), translation(vec3(0, 0, 0)), rotationAxis(0, 0, 1), rotationAngle(0) {
+	Object(Shader *_shader, Material *_material, Texture *_texture, Geometry *_geometry) : scale(vec3(1, 1, 1)), translation(vec3(0, 0, 0)), rotationAxis(0, 0, 1), rotationAngle(0)
+	{
 		shader = _shader;
 		texture = _texture;
 		material = _material;
 		geometry = _geometry;
 	}
 
-	void Draw(RenderState state) {
+	void Draw(RenderState state)
+	{
 		state.M = ScaleMatrix(scale) * RotationMatrix(rotationAngle, rotationAxis) * TranslateMatrix(translation);
 		state.Minv = TranslateMatrix(-translation) * RotationMatrix(-rotationAngle, rotationAxis) * ScaleMatrix(vec3(1 / scale.x, 1 / scale.y, 1 / scale.z));
 		state.MVP = state.M * state.V * state.P;
@@ -560,93 +683,95 @@ public:
 	void Animate(float tstart, float tend) { rotationAngle = 0.8 * tend; }
 };
 
-class Scene {
+class Scene
+{
 	std::vector<Object *> objects;
+
 public:
-	Camera camera; 
+	Camera camera;
 	Light light;
 
-	void Build() {
-		
-		Shader * phongShader = new PhongShader();
-		Shader * gouraudShader = new GouraudShader();
-		Shader * nprShader = new NPRShader();
+	void Build()
+	{
 
-		
-		Material * material0 = new Material;
+		Shader *phongShader = new PhongShader();
+		Shader *gouraudShader = new GouraudShader();
+		Shader *nprShader = new NPRShader();
+
+		Material *material0 = new Material;
 		material0->kd = vec3(1.0f, 0.1f, 0.2f);
 		material0->ks = vec3(1, 1, 1);
 		material0->ka = vec3(0.2f, 0.2f, 0.2f);
 		material0->shininess = 50;
 
-		Material * material1 = new Material;
+		Material *material1 = new Material;
 		material1->kd = vec3(0, 1, 1);
 		material1->ks = vec3(2, 2, 2);
 		material1->ka = vec3(0.2f, 0.2f, 0.2f);
 		material1->shininess = 200;
 
-		
-		Texture * texture4x8 = new CheckerBoardTexture(4, 8);
-		Texture * texture15x20 = new CheckerBoardTexture(15, 20);
+		Texture *texture4x8 = new CheckerBoardTexture(4, 8);
+		Texture *texture15x20 = new CheckerBoardTexture(15, 20);
 
-		
-		Geometry * torus = new Torus();
-		Geometry * sphere = new Sphere();
+		Geometry *torus = new Torus();
+		Geometry *sphere = new Sphere();
 
-		
-		Object * torusObject1 = new Object(phongShader, material0, texture4x8, torus);
+		Object *torusObject1 = new Object(phongShader, material0, texture4x8, torus);
 		torusObject1->translation = vec3(-1, -1, 0);
 		torusObject1->rotationAxis = vec3(1, 1, 1);
 		torusObject1->scale = vec3(0.7f, 0.7f, 0.7f);
 		objects.push_back(torusObject1);
 
-		Object * sphereObject1 = new Object(phongShader, material1, texture15x20, sphere);
+		Object *sphereObject1 = new Object(phongShader, material1, texture15x20, sphere);
 		sphereObject1->translation = vec3(1, -1, 0);
 		sphereObject1->rotationAxis = vec3(0, 1, 1);
 		sphereObject1->scale = vec3(0.5f, 1.2f, 0.5f);
 		objects.push_back(sphereObject1);
 
-		Object * torusObject2 = new Object(nprShader, NULL, texture4x8, torus);
+		Object *torusObject2 = new Object(nprShader, NULL, texture4x8, torus);
 		torusObject2->translation = vec3(-1, 1, -1);
 		torusObject2->rotationAxis = vec3(1, 1, -1);
 		torusObject2->scale = vec3(0.7f, 0.7f, 0.7f);
 		objects.push_back(torusObject2);
 
-		Object * sphereObject2 = new Object(gouraudShader, material1, NULL, sphere);
+		Object *sphereObject2 = new Object(gouraudShader, material1, NULL, sphere);
 		sphereObject2->translation = vec3(1, 1, -1);
 		sphereObject2->rotationAxis = vec3(0, 1, -1);
 		sphereObject2->scale = vec3(0.5f, 1.2f, 0.5f);
 		objects.push_back(sphereObject2);
 
-		
 		camera.wEye = vec3(0, 0, 4);
 		camera.wLookat = vec3(0, 0, 0);
 		camera.wVup = vec3(0, 1, 0);
 
-		
-		light.wLightPos = vec4(5, 5, 4, 0);	
+		light.wLightPos = vec4(5, 5, 4, 0);
 		light.La = vec3(1, 1, 1);
 		light.Le = vec3(3, 3, 3);
 	}
-	void Render() {
+	void Render()
+	{
 		RenderState state;
 		state.wEye = camera.wEye;
 		state.V = camera.V();
 		state.P = camera.P();
 		state.light = light;
-		for (Object * obj : objects) obj->Draw(state);
+		for (Object *obj : objects)
+			obj->Draw(state);
 	}
 
-	void Animate(float tstart, float tend) {
+	void Animate(float tstart, float tend)
+	{
 		camera.Animate(tend);
 		light.Animate(tend);
-		for (Object * obj : objects) obj->Animate(tstart, tend);
+		for (Object *obj : objects)
+			obj->Animate(tstart, tend);
 	}
 };
 
 Scene scene;
- 
-void onInitialization() {
+
+void onInitialization()
+{
 	glViewport(0, 0, windowWidth, windowHeight);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
@@ -654,51 +779,56 @@ void onInitialization() {
 	scene.Build();
 }
 
-void onDisplay() {
-	glClearColor(0.5f, 0.5f, 0.8f, 1.0f);							
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+void onDisplay()
+{
+	glClearColor(0.5f, 0.5f, 0.8f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	scene.Render();
-	glutSwapBuffers();									
+	glutSwapBuffers();
 }
 
-void onKeyboard(unsigned char key, int pX, int pY) { }
+void onKeyboard(unsigned char key, int pX, int pY) {}
 
-void onKeyboardUp(unsigned char key, int pX, int pY) { }
+void onKeyboardUp(unsigned char key, int pX, int pY) {}
 
-void onMouse(int button, int state, int pX, int pY) { }
+void onMouse(int button, int state, int pX, int pY) {}
 
-void onMouseMotion(int pX, int pY) {
+void onMouseMotion(int pX, int pY)
+{
 }
 
-void onIdle() {
+void onIdle()
+{
 	static float tend = 0;
-	const float dt = 0.1; 
+	const float dt = 0.1;
 	float tstart = tend;
 	tend = glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
 
-	for (float t = tstart; t < tend; t += dt) {
+	for (float t = tstart; t < tend; t += dt)
+	{
 		float Dt = fmin(dt, tend - t);
-		scene.Animate(t, t + Dt); 
+		scene.Animate(t, t + Dt);
 	}
 	glutPostRedisplay();
 }
 
-int main(int argc, char * argv[]) {
+int main(int argc, char *argv[])
+{
 	glutInit(&argc, argv);
 #if !defined(__APPLE__)
 	glutInitContextVersion(3, 3);
 #endif
-	glutInitWindowSize(windowWidth, windowHeight);				
-	glutInitWindowPosition(100, 100);							
+	glutInitWindowSize(windowWidth, windowHeight);
+	glutInitWindowPosition(100, 100);
 #if defined(__APPLE__)
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_3_2_CORE_PROFILE);  
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_3_2_CORE_PROFILE);
 #else
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 #endif
 	glutCreateWindow(argv[0]);
 
 #if !defined(__APPLE__)
-	glewExperimental = true;	
+	glewExperimental = true;
 	glewInit();
 #endif
 	printf("GL Vendor    : %s\n", glGetString(GL_VENDOR));
@@ -712,7 +842,7 @@ int main(int argc, char * argv[]) {
 
 	onInitialization();
 
-	glutDisplayFunc(onDisplay);                
+	glutDisplayFunc(onDisplay);
 	glutMouseFunc(onMouse);
 	glutIdleFunc(onIdle);
 	glutKeyboardFunc(onKeyboard);
@@ -722,4 +852,3 @@ int main(int argc, char * argv[]) {
 	glutMainLoop();
 	return 1;
 }
-
